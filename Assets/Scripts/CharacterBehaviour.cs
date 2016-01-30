@@ -33,13 +33,16 @@ public class CharacterBehaviour : MonoBehaviour {
         }
         else movey = 0;
 
-        move = new Vector3(movex * speed, 0, zMove);
-        move.z -= gravity * Time.deltaTime;
+        move = new Vector3(0, zMove, movex * speed);
+        //move.z -= gravity * Time.deltaTime;
 
     }
 
     void FixedUpdate()
     {
-        GetComponent<Rigidbody>().velocity = new Vector3(movex * speed, 0, zMove);
+        GetComponent<Rigidbody>().velocity = move;
+       // Vector3 pos = GetComponent<Rigidbody>().position;
+       // pos.z -= gravity;
+       // GetComponent<Rigidbody>().position = pos;
     }
 }
