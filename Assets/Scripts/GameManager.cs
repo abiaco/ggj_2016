@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour {
     // Variable declarations
     public GameObject ThePlayer;
 
+
     #region Singleton Check
     private static GameManager gameManagerInstance = null;
 

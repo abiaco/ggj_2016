@@ -6,16 +6,14 @@ public class PlayerInput : MonoBehaviour {
 
     public float speed = 20.0f;
     public float jumpSpeed = 8.0F;
-    public float gravity = 0.003f;
-    private float movex = 0f;
-    private float movey = 0f;
-    float zMove = 0f;
     private Vector3 xForceToAdd = Vector3.zero;
-
+    private float xPos = 0;
     private enum Control_Type { keyboard, gamepad, touch}
     [SerializeField]
     private Control_Type ControlType = Control_Type.keyboard;
     private Rigidbody PlayerRigidBody;
+    private bool jumpEnabled = false;
+    public float maxXVelocity = 1000f;
 
     // Use this for initialization
     void Start () {
@@ -28,17 +26,33 @@ public class PlayerInput : MonoBehaviour {
         switch (ControlType)
         {
             case Control_Type.keyboard:
-                // INSERT KEYBOARD CONTROLS HERE
+                if (Input.GetKey(KeyCode.LeftArrow))
+                {
+                    xPos = -1f;
+                }
+                else if (Input.GetKey(KeyCode.RightArrow))
+                {
+                    xPos = 1f;
+                }
+                else xPos = 0f;
+                // Send horizontal movement
+                PlayerHorizontalMovement(xPos);
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    PlayerJumpMovement(jumpSpeed);
+                }
                 break;
             case Control_Type.gamepad:
                 // Use last device which provided input.
                 var inputDevice = InputManager.ActiveDevice;
+                xPos = inputDevice.LeftStickX;
                 // Send horizontal movement
-                PlayerHorizontalMovement(inputDevice.LeftStickX);
-                // Send jump movement
-                if (inputDevice.Action1.IsPressed)
+                PlayerHorizontalMovement(xPos);
+                // Check that player is on the ground
+                if (inputDevice.Action1.WasPressed)
                 {
-                    PlayerJumpMovement();
+                    // Send jump movement
+                    PlayerJumpMovement(jumpSpeed);
                 }
                 break;
             case Control_Type.touch:
@@ -55,10 +69,14 @@ public class PlayerInput : MonoBehaviour {
     }
 
     //! Function to control jump movement
-    private void PlayerJumpMovement()
+    private void PlayerJumpMovement(float jumpPower)
     {
-        Vector3 jumpForce = new Vector3(0, jumpSpeed, 0);
-        PlayerRigidBody.AddForce(jumpForce);
+        // Check that player is on the ground
+        if (GameManager.Instance.ThePlayer.GetComponent<PlayerProperties>().CheckGroundDist())
+        {
+            Vector3 jumpForce = new Vector3(0, jumpPower, 0);
+            PlayerRigidBody.AddForce(jumpForce);
+        }
     }
     
 	
