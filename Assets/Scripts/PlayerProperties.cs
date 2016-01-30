@@ -4,7 +4,7 @@ using System.Collections;
 public class PlayerProperties : MonoBehaviour
 {
 
-    private float groundDistThreshold = 0.75f;
+    private float groundDistThreshold = 1.15f;
 
     [SerializeField]
     // Player Health
