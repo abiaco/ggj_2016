@@ -76,7 +76,7 @@ public class PlayerInput : MonoBehaviour {
         }
         xForceToAdd = new Vector3(force * speed, 0, 0);
             PlayerRigidBody.AddForce(xForceToAdd);
-        
+        PlayerRigidBody.velocity = new Vector3 (Mathf.Clamp(PlayerRigidBody.velocity.x, (-1 * maxXVelocity), maxXVelocity), PlayerRigidBody.velocity.y, 0f);
     }
 
     //! Function to control jump movement
