@@ -14,9 +14,11 @@ public class PlayerInput : MonoBehaviour {
     private Rigidbody PlayerRigidBody;
     private bool jumpEnabled = false;
     public float maxXVelocity = 1000f;
-
+    public Controller controller;
+    Action action;
     // Use this for initialization
     void Start () {
+        controller = new Controller();
         PlayerRigidBody = GameManager.Instance.ThePlayer.GetComponent<Rigidbody>();
 	}
 
@@ -29,30 +31,83 @@ public class PlayerInput : MonoBehaviour {
                 if (Input.GetKey(KeyCode.LeftArrow))
                 {
                     xPos = -1f;
+                    Debug.Log("left move");
+                    controller.action.setType(ActionType.moveLeft);
+                    if (GameManager.Instance.ThePlayer.GetComponent<PlayerProperties>().DetectWallLeft(false))
+                    {
+                        xPos = Mathf.Clamp(xPos, -1f, 0f);
+                    }
+                    // Check that player is not against a wall to the left
+                    if (GameManager.Instance.ThePlayer.GetComponent<PlayerProperties>().DetectWallLeft(true))
+                    {
+                        xPos = Mathf.Clamp(xPos, 0f, 1f);
+                    }
+                    xForceToAdd = new Vector3(xPos * speed, 0, 0);
+                    controller.action.setForce(xForceToAdd);
+
+
                 }
                 else if (Input.GetKey(KeyCode.RightArrow))
                 {
                     xPos = 1f;
+                    Debug.Log("right move");
+
+                    controller.action.setType(ActionType.moveRight);
+                    if (GameManager.Instance.ThePlayer.GetComponent<PlayerProperties>().DetectWallLeft(false))
+                    {
+                        xPos = Mathf.Clamp(xPos, -1f, 0f);
+                    }
+                    // Check that player is not against a wall to the left
+                    if (GameManager.Instance.ThePlayer.GetComponent<PlayerProperties>().DetectWallLeft(true))
+                    {
+                        xPos = Mathf.Clamp(xPos, 0f, 1f);
+                    }
+                    xForceToAdd = new Vector3(xPos * speed, 0, 0);
+                    controller.action.setForce(xForceToAdd);
                 }
                 else xPos = 0f;
                 // Send horizontal movement
-                PlayerHorizontalMovement(xPos);
+              //  PlayerHorizontalMovement(xPos);
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    PlayerJumpMovement(jumpSpeed);
+                    Debug.Log("jump");
+
+                    controller.action.setType(ActionType.jump);
+                    controller.action.setForce(new Vector3(0, jumpSpeed, 0));
+                   // PlayerJumpMovement(jumpSpeed);
+                }
+
+                if (Input.GetKeyDown(KeyCode.S))
+                {
+                    Debug.Log("save");
+                    controller.action.setType(ActionType.save);
+                    controller.action.setForce(Vector3.zero);
+                   // GameManager.Instance.deathGod.pissOff();
+                }
+
+                if (Input.GetKeyDown(KeyCode.K))
+                {
+                    Debug.Log("sacrifice");
+                    controller.action.setType(ActionType.sacrifice);
+                    controller.action.setForce(Vector3.zero);
+                   // GameManager.Instance.natureGod.pissOff();
                 }
                 break;
             case Control_Type.gamepad:
                 // Use last device which provided input.
                 var inputDevice = InputManager.ActiveDevice;
                 xPos = inputDevice.LeftStickX;
+                controller.action.setType(xPos > 0 ? ActionType.moveRight : ActionType.moveLeft);
+                controller.action.setForce(new Vector3(xPos * speed, 0, 0));
                 // Send horizontal movement
-                PlayerHorizontalMovement(xPos);
+              //  PlayerHorizontalMovement(xPos);
                 // Check that player is on the ground
                 if (inputDevice.Action1.WasPressed)
                 {
                     // Send jump movement
-                    PlayerJumpMovement(jumpSpeed);
+                    controller.action.setType(ActionType.jump);
+                    controller.action.setForce(new Vector3(0, jumpSpeed, 0));
+                   // PlayerJumpMovement(jumpSpeed);
                 }
                 break;
             case Control_Type.touch:
@@ -64,19 +119,8 @@ public class PlayerInput : MonoBehaviour {
     //! Function to control horizontal velocity
     private void PlayerHorizontalMovement(float force)
     {
-        // Check that player is not against a wall to the right
-        if (GameManager.Instance.ThePlayer.GetComponent<PlayerProperties>().DetectWallLeft(false))
-        {
-            force = Mathf.Clamp(force, -1f, 0f);
-        }
-        // Check that player is not against a wall to the left
-        if (GameManager.Instance.ThePlayer.GetComponent<PlayerProperties>().DetectWallLeft(true))
-        {
-            force = Mathf.Clamp(force, 0f, 1f);
-        }
         xForceToAdd = new Vector3(force * speed, 0, 0);
-            PlayerRigidBody.AddForce(xForceToAdd);
-        PlayerRigidBody.velocity = new Vector3 (Mathf.Clamp(PlayerRigidBody.velocity.x, (-1 * maxXVelocity), maxXVelocity), PlayerRigidBody.velocity.y, 0f);
+        PlayerRigidBody.AddForce(xForceToAdd);
     }
 
     //! Function to control jump movement
@@ -87,8 +131,6 @@ public class PlayerInput : MonoBehaviour {
         {
             Vector3 jumpForce = new Vector3(0, jumpPower, 0);
             PlayerRigidBody.AddForce(jumpForce);
-            //TEMP
-            AudioManager.Instance.TriggerJumpSound();
         }
     }
     
@@ -99,6 +141,9 @@ public class PlayerInput : MonoBehaviour {
         {
             // Call function to accept input
             AcceptInput();
+            controller.ApplyAction(PlayerRigidBody);
+
+            controller.action = new Action();
         }
         else
         {
@@ -107,5 +152,7 @@ public class PlayerInput : MonoBehaviour {
                 GameManager.Instance.CurrentGameState = GameManager.GameState.Started;
             }
         }
+        
     }
+
 }
