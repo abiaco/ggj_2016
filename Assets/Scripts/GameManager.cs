@@ -72,10 +72,13 @@ public class GameManager : MonoBehaviour
     #endregion
 
 
-
+    public DeathGod deathGod;
+    public NatureGod natureGod;
     // Use this for initialization
     void Start()
     {
+        deathGod = new DeathGod();
+        natureGod = new NatureGod();
         CurrentLevel = GameLevel.Level1;
     }
 
