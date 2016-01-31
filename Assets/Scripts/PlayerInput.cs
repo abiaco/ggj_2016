@@ -64,8 +64,19 @@ public class PlayerInput : MonoBehaviour {
     //! Function to control horizontal velocity
     private void PlayerHorizontalMovement(float force)
     {
+        // Check that player is not against a wall to the right
+        if (GameManager.Instance.ThePlayer.GetComponent<PlayerProperties>().DetectWallLeft(false))
+        {
+            force = Mathf.Clamp(force, -1f, 0f);
+        }
+        // Check that player is not against a wall to the left
+        if (GameManager.Instance.ThePlayer.GetComponent<PlayerProperties>().DetectWallLeft(true))
+        {
+            force = Mathf.Clamp(force, 0f, 1f);
+        }
         xForceToAdd = new Vector3(force * speed, 0, 0);
-        PlayerRigidBody.AddForce(xForceToAdd);
+            PlayerRigidBody.AddForce(xForceToAdd);
+        
     }
 
     //! Function to control jump movement
@@ -82,9 +93,17 @@ public class PlayerInput : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-        // Call function to accept input
-        AcceptInput();
-
+        if (GameManager.Instance.CurrentGameState == GameManager.GameState.Started)
+        {
+            // Call function to accept input
+            AcceptInput();
+        }
+        else
+        {
+            if (Input.anyKeyDown)
+            {
+                GameManager.Instance.CurrentGameState = GameManager.GameState.Started;
+            }
+        }
     }
 }
