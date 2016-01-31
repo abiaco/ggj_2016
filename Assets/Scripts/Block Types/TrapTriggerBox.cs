@@ -23,6 +23,7 @@ public class TrapTriggerBox : MonoBehaviour {
             {
                 MoveBlocks[i].GetComponent<MoveBlock>().StartBlockMovement();
             }
+            AudioManager.Instance.TriggerTrapSound();
         }
     }
 

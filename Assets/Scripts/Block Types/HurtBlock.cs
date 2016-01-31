@@ -17,6 +17,7 @@ public class HurtBlock : MonoBehaviour
         {
             // Tell the player to lose health
             GameManager.Instance.ThePlayer.GetComponent<PlayerProperties>().LoseHealth(1000f);
+            AudioManager.Instance.TriggerDeathSound();
         }
     }
 

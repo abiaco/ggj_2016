@@ -36,6 +36,8 @@ public class GameManager : MonoBehaviour
 
     private bool gameRunning = false;
 
+    public Material[] backgroundMaterials;
+
     #region Singleton Check
     private static GameManager gameManagerInstance = null;
 
@@ -95,6 +97,7 @@ public class GameManager : MonoBehaviour
     {
         ThePlayer.GetComponent<PlayerProperties>().ResetPlayer();
         SpawnLevel(CurrentLevel);
+       // ThePlayer.transform.FindChild ("Backdrop").GetComponent<MeshRenderer>().materials[0] = backgroundMaterials[(int)CurrentLevel];
     }
 
     //! Check game state
@@ -107,6 +110,12 @@ public class GameManager : MonoBehaviour
                 if (!Menu.activeInHierarchy)
                 {
                     Menu.gameObject.SetActive(true);
+                    if (AudioManager.Instance.GetComponent<AudioSource>().clip != AudioManager.Instance.MusicFiles[0])
+                    {
+                        AudioManager.Instance.GetComponent<AudioSource>().clip = AudioManager.Instance.MusicFiles[0];
+                        AudioManager.Instance.GetComponent<AudioSource>().volume = 0.5f;
+                        AudioManager.Instance.GetComponent<AudioSource>().Play();
+                    }
                 }
                 break;
             case GameState.Started:
@@ -120,6 +129,15 @@ public class GameManager : MonoBehaviour
                 {
                     RestartPlay();
                     gameRunning = true;
+
+
+                    if (AudioManager.Instance.GetComponent<AudioSource>().clip != AudioManager.Instance.MusicFiles[1])
+                    {
+                        AudioManager.Instance.GetComponent<AudioSource>().clip = AudioManager.Instance.MusicFiles[1];
+                        AudioManager.Instance.GetComponent<AudioSource>().volume = 1.0f;
+                        AudioManager.Instance.GetComponent<AudioSource>().Play();
+                    }
+
                 }
                 // Check that the death screen is inactive
                 if (LoseScreen.activeInHierarchy)

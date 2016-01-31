@@ -87,6 +87,8 @@ public class PlayerInput : MonoBehaviour {
         {
             Vector3 jumpForce = new Vector3(0, jumpPower, 0);
             PlayerRigidBody.AddForce(jumpForce);
+            //TEMP
+            AudioManager.Instance.TriggerJumpSound();
         }
     }
     
